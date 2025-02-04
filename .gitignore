@@ -1,0 +1,6 @@
+core/components/modxai1y/vendor/
+/core/components/modxai1y/.DS_Store
+.nova/
+.DS_Store
+/vendor
+/config.core.php
