@@ -15,39 +15,59 @@ $apiKey = $modx->getOption("modxai1y.apikey");
 $imageCaptionPrompt = $modx->getOption(
     "modxai1y.image_caption_prompt",
     null,
-    "Generate a description for an image alt attribute."
+    "Write a very short description of the image with a maximum of 100 characters for screen readers."
+);
+$fieldQueries = $modx->getOption(
+    "modxai1y.field_queries",
+    null,
+    '[
+        {
+            parent: ".contentblocks-field-gallery-image",
+            image: ".contentblocks-field-gallery-image-view img",
+            target: ".title"
+        },
+        {
+            parent: ".contentblocks-field-image_with_title",
+            image: ".contentblocks-field-image-preview-img",
+            target: ".contentblocks-field-image-title-input"
+        }
+    ]',
+    true
 );
 
 # JS/CSS code
 $code = <<<HTML
 
 <script>
-    let apiKey = "$apiKey";
+    let apiKey = "$apiKey",
+        fieldQueries = $fieldQueries;
     
     let addButtons = (node) => {
-        let fields = node.parentNode.querySelectorAll('.contentblocks-field-gallery-image');
-        fields.forEach((field, i) => {
-            let button = document.createElement('button'),
-                anchorName = "--modxai__field" + i,
-                imageUrl = field.querySelector('.contentblocks-field-gallery-image-view img').src,
-                output = field.querySelector('.title');
-            button.innerText = 'AI';
-            button.classList.add('modxai__button');
-            button.style.positionAnchor = anchorName;
-            button.addEventListener('click', (e) => {
-                askAI(imageUrl, output, button);
+        fieldQueries.forEach((fieldQuery) => {
+            let fields = node.parentNode.querySelectorAll(fieldQuery.parent);
+            fields.forEach((field, i) => {
+                let button = document.createElement("button"),
+                    anchorName = "--modxai__field" + i,
+                    imageUrl = field.querySelector(fieldQuery.image).src,
+                    target = field.querySelector(fieldQuery.target);
+                button.innerText = "AI";
+                button.classList.add("modxai__button");
+                button.style.positionAnchor = anchorName;
+                button.addEventListener("click", (e) => {
+                    askAI(imageUrl, target, button);
+                });
+                field.appendChild(button);
+                target.style.anchorName = anchorName;
             });
-            field.appendChild(button);
-            output.style.anchorName = anchorName;
-        });        
+        });    
     };
     
-    let askAI = (imageUrl, output, button) => {
+    let askAI = (imageUrl, target, button) => {
         if (!apiKey) {
-            alert('Please enter an API key. You can get a free one at platform.openai.com.');
+            alert("Please enter an API key. You can get a free one at platform.openai.com.");
             return;
         }
-        button.classList.add('modxai__loading');          
+        button.classList.add("modxai__loading");          
         fetch(imageUrl)
             .then((response) => response.blob())
             .then((response) => {
@@ -82,8 +102,8 @@ $code = <<<HTML
                     })
                         .then((response) => response.json())
                         .then((response) => {
-                            output.value = response.choices[0].message.content;
-                            button.classList.remove('modxai__loading');
+                            target.value = response.choices[0].message.content;
+                            button.classList.remove("modxai__loading");
                         }); 
                 };
                 reader.readAsDataURL(response);
@@ -102,7 +122,7 @@ $code = <<<HTML
         }
     });
     
-    window.addEventListener('load', () => {
+    window.addEventListener("load", () => {
         setTimeout(() => {
             let parent = document.getElementById("contentblocks");
             addButtons(parent);

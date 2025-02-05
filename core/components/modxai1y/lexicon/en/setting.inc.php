@@ -11,3 +11,6 @@ $_lang["setting_modxai1y.apikey_desc"] =
 $_lang["setting_modxai1y.image_caption_prompt"] = "Image Caption Prompt";
 $_lang["setting_modxai1y.image_caption_prompt_desc"] =
     "Feel free to enter your own image caption prompt.";
+$_lang["setting_modxai1y.field_queries"] = "Field query JSON";
+$_lang["setting_modxai1y.field_queries_desc"] =
+    "Define your MODX Manager fields via JSON where modxAI1y should be appended.";
