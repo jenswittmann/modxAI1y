@@ -23,6 +23,25 @@ $code = <<<HTML
 
 <script>
     let apiKey = "$apiKey";
+    
+    let addButtons = (node) => {
+        let fields = node.parentNode.querySelectorAll('.contentblocks-field-gallery-image');
+        fields.forEach((field, i) => {
+            let button = document.createElement('button'),
+                anchorName = "--modxai__field" + i,
+                imageUrl = field.querySelector('.contentblocks-field-gallery-image-view img').src,
+                output = field.querySelector('.title');
+            button.innerText = 'AI';
+            button.classList.add('modxai__button');
+            button.style.positionAnchor = anchorName;
+            button.addEventListener('click', (e) => {
+                askAI(imageUrl, output, button);
+            });
+            field.appendChild(button);
+            output.style.anchorName = anchorName;
+        });        
+    };
+    
     let askAI = (imageUrl, output, button) => {
         if (!apiKey) {
             alert('Please enter an API key. You can get a free one at platform.openai.com.');
@@ -71,22 +90,26 @@ $code = <<<HTML
             });
     };
     
+    const observer = new MutationObserver((mutationList, observer) => {
+        for (const mutation of mutationList) {
+            if (mutation.type === "childList") {
+                mutationList.forEach((item) => {
+                    item.addedNodes.forEach((node) => {
+                        addButtons(node.nextSibling);
+                    });
+                });
+            }
+        }
+    });
+    
     window.addEventListener('load', () => {
         setTimeout(() => {
-            let fields = document.querySelectorAll('.contentblocks-field-gallery-image');
-            fields.forEach((field, i) => {
-                let button = document.createElement('button'),
-                    anchorName = "--modxai__field" + i,
-                    imageUrl = field.querySelector('.contentblocks-field-gallery-image-view img').src,
-                    output = field.querySelector('.title');
-                button.innerText = 'AI';
-                button.classList.add('modxai__button');
-                button.style.positionAnchor = anchorName;
-                button.addEventListener('click', (e) => {
-                    askAI(imageUrl, output, button);
-                });
-                field.appendChild(button);
-                output.style.anchorName = anchorName;
+            let parent = document.getElementById("contentblocks");
+            addButtons(parent);
+            observer.observe(parent, {
+                attributes: false,
+                childList: true,
+                subtree: true
             });
         }, 1000);
     });
