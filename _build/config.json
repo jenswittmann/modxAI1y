@@ -3,7 +3,7 @@
     "lowCaseName": "modxai1y",
     "description": "modxAI1y helps you with some AI magic to generate simple image captions in ContentBlocks.",
     "author": "Jens Wittmann",
-    "version": "0.1.0-pl",
+    "version": "0.1.1-beta",
     "package": {
         "elements": {
             "plugins": [
@@ -23,6 +23,12 @@
             {
                 "key": "image_caption_prompt",
                 "type": "textfield",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "field_queries",
+                "type": "textarea",
                 "area": "default",
                 "value": ""
             }
