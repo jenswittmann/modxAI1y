@@ -4,3 +4,5 @@ core/components/cbaltgenerator/vendor/
 .DS_Store
 /vendor
 /config.core.php
+
+/_packages/cbaltgenerator-*
