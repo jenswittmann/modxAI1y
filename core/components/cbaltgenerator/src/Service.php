@@ -44,6 +44,7 @@ class Service
         $context = mb_substr($context, 0, 200);
         $maxLength = max(20, (int) $this->setting('max_length', 125));
 
+        @set_time_limit(150); // some services need half a minute and more for a new image
         $text = $this->provider($provider)->generate($data, $mediaType, $context, $maxLength);
 
         // Claude is asked for the length, InkluDocs has its own rules: only tidy up its text

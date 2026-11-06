@@ -35,7 +35,7 @@ class InkluDocsProvider extends AbstractProvider
         try {
             $response = (new Client([
                 'base_uri' => rtrim((string) $this->setting('inkludocs_base_url', self::DEFAULT_BASE_URL), '/') . '/',
-                'timeout' => 45,
+                'timeout' => 120, // a new image takes 25 to 45 seconds
                 'http_errors' => false,
             ]))->post('api/v1/alt-text', ['headers' => ['X-API-Key' => $key, 'Accept' => 'application/json'], 'json' => $body]);
         } catch (GuzzleException $e) {

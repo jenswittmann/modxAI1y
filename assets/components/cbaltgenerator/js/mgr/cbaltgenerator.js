@@ -78,6 +78,7 @@
 
             MODx.Ajax.request({
                 url: MODx.config.connector_url,
+                timeout: 150000, // the default of 30 seconds is too short for some services
                 params: {
                     action: config.connectorAction,
                     namespace: 'cbaltgenerator',
