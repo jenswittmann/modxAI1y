@@ -1,5 +1,5 @@
 {
-    "name": "jenswittmann/modxAI1y",
-    "description": "modxAI1y creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
+    "name": "jenswittmann/contentblocks-image-alt-text-generator",
+    "description": "ContentBlocks-Image-ALT-Text-Generator creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
     "author": "Jens Wittmann <kontakt@jens-wittmann.de>"
 }

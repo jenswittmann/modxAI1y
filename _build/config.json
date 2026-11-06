@@ -1,14 +1,14 @@
 {
-    "name": "modxAI1y",
-    "lowCaseName": "modxai1y",
-    "description": "modxAI1y creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
+    "name": "ContentBlocks-Image-ALT-Text-Generator",
+    "lowCaseName": "cbaltgenerator",
+    "description": "ContentBlocks-Image-ALT-Text-Generator creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
     "author": "Jens Wittmann",
     "version": "0.2.0-beta",
     "package": {
         "elements": {
             "plugins": [
                 {
-                    "name": "modxai1y",
+                    "name": "cbaltgenerator",
                     "events": [
                         "OnManagerPageBeforeRender"
                     ]

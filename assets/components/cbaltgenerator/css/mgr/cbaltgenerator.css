@@ -1,0 +1,47 @@
+.cbaltgenerator-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em 1em;
+    margin-top: 0.5em;
+}
+
+.cbaltgenerator-row {
+    display: grid !important; /* ContentBlocks sets the display of its title container */
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.cbaltgenerator-row > .cbaltgenerator-wrap {
+    display: contents;
+}
+
+.cbaltgenerator-row .cbaltgenerator-status {
+    grid-column: 1 / -1;
+}
+
+.cbaltgenerator-button {
+    padding: 0.4em 0.8em;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: #f1f1f1;
+    border: 1px solid #c4c4c4;
+    border-radius: 3px;
+}
+
+.cbaltgenerator-button:hover,
+.cbaltgenerator-button:focus-visible {
+    background: #e4e4e4;
+}
+
+.cbaltgenerator-button[aria-busy='true'] {
+    cursor: progress;
+    opacity: 0.6;
+}
+
+.cbaltgenerator-status {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
