@@ -1,16 +1,25 @@
 <?php
 /**
- * Settings Lexicon Entries
+ * Settings Lexicon Entries (en)
  *
  * @package modxai1y
  * @subpackage lexicon
  */
-$_lang["setting_modxai1y.apikey"] = "OpenAI API Key";
-$_lang["setting_modxai1y.apikey_desc"] =
-    "You can get a free one at platform.openai.com.";
-$_lang["setting_modxai1y.image_caption_prompt"] = "Image Caption Prompt";
-$_lang["setting_modxai1y.image_caption_prompt_desc"] =
-    "Feel free to enter your own image caption prompt.";
-$_lang["setting_modxai1y.field_queries"] = "Field query JSON";
-$_lang["setting_modxai1y.field_queries_desc"] =
-    "Define your MODX Manager fields via JSON where modxAI1y should be appended.";
+$_lang['setting_modxai1y.apikey'] = 'Anthropic API key';
+$_lang['setting_modxai1y.apikey_desc'] = 'The key stays on the server and is never sent to the browser. Create one at console.anthropic.com. Empty: the environment variable ANTHROPIC_API_KEY is used.';
+$_lang['setting_modxai1y.model'] = 'Model';
+$_lang['setting_modxai1y.model_desc'] = 'Claude model that describes the images. Default: claude-haiku-5-5 (fast and cheap, enough for short alt texts).';
+$_lang['setting_modxai1y.prompt'] = 'Prompt';
+$_lang['setting_modxai1y.prompt_desc'] = 'Instruction for the alt texts. Placeholders: {max_length}, {language}. Empty: the default prompt of the extra.';
+$_lang['setting_modxai1y.language'] = 'Language of the alt texts';
+$_lang['setting_modxai1y.language_desc'] = 'Written as it should appear in the prompt, e.g. Deutsch or English.';
+$_lang['setting_modxai1y.max_length'] = 'Maximum length';
+$_lang['setting_modxai1y.max_length_desc'] = 'Maximum number of characters of an alt text.';
+$_lang['setting_modxai1y.max_image_edge'] = 'Maximum image edge';
+$_lang['setting_modxai1y.max_image_edge_desc'] = 'Bigger images are scaled down to this edge length (pixels) before they are sent. Saves time and costs.';
+$_lang['setting_modxai1y.allowed_paths'] = 'Allowed image folders';
+$_lang['setting_modxai1y.allowed_paths_desc'] = 'Comma separated, relative to the web root. Only images below these folders are read.';
+$_lang['setting_modxai1y.field_queries'] = 'Field query JSON';
+$_lang['setting_modxai1y.field_queries_desc'] = 'Selectors of the ContentBlocks fields where the button is added: [{"field": "…", "image": "…", "target": "…"}]. Empty: the image fields with title and the gallery.';
+$_lang['setting_modxai1y.api_base_url'] = 'API base URL';
+$_lang['setting_modxai1y.api_base_url_desc'] = 'Only for proxies or tests. Empty: https://api.anthropic.com.';

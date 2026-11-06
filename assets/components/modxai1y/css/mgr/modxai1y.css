@@ -1,0 +1,47 @@
+.modxai1y-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5em 1em;
+    margin-top: 0.5em;
+}
+
+.modxai1y-row {
+    display: grid !important; /* ContentBlocks sets the display of its title container */
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5em;
+    align-items: center;
+}
+
+.modxai1y-row > .modxai1y-wrap {
+    display: contents;
+}
+
+.modxai1y-row .modxai1y-status {
+    grid-column: 1 / -1;
+}
+
+.modxai1y-button {
+    padding: 0.4em 0.8em;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    background: #f1f1f1;
+    border: 1px solid #c4c4c4;
+    border-radius: 3px;
+}
+
+.modxai1y-button:hover,
+.modxai1y-button:focus-visible {
+    background: #e4e4e4;
+}
+
+.modxai1y-button[aria-busy='true'] {
+    cursor: progress;
+    opacity: 0.6;
+}
+
+.modxai1y-status {
+    font-size: 0.9em;
+    opacity: 0.8;
+}
