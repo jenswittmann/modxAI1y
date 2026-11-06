@@ -1,35 +1,109 @@
 {
-    "name": "modxAI1y",
-    "lowCaseName": "modxai1y",
-    "description": "modxAI1y helps you with some AI magic to generate simple image captions in ContentBlocks.",
+    "name": "ContentBlocks-Image-ALT-Text-Generator",
+    "lowCaseName": "cbaltgenerator",
+    "description": "ContentBlocks-Image-ALT-Text-Generator creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
     "author": "Jens Wittmann",
-    "version": "0.1.1-beta",
+    "version": "0.2.0-beta",
     "package": {
         "elements": {
             "plugins": [
                 {
-                    "name": "modxai1y",
-                    "events": ["OnManagerPageBeforeRender"]
+                    "name": "cbaltgenerator",
+                    "events": [
+                        "OnManagerPageBeforeRender"
+                    ]
                 }
             ]
         },
         "systemSettings": [
             {
-                "key": "apikey",
+                "key": "provider",
                 "type": "textfield",
+                "area": "default",
+                "value": "claude"
+            },
+            {
+                "key": "apikey",
+                "type": "text-password",
                 "area": "default",
                 "value": ""
             },
             {
-                "key": "image_caption_prompt",
+                "key": "model",
                 "type": "textfield",
                 "area": "default",
+                "value": "claude-haiku-5-5"
+            },
+            {
+                "key": "prompt",
+                "type": "textarea",
+                "area": "default",
                 "value": ""
+            },
+            {
+                "key": "language",
+                "type": "textfield",
+                "area": "default",
+                "value": "Deutsch"
+            },
+            {
+                "key": "use_context",
+                "type": "combo-boolean",
+                "area": "default",
+                "value": "1"
+            },
+            {
+                "key": "max_length",
+                "type": "numberfield",
+                "area": "default",
+                "value": "125"
+            },
+            {
+                "key": "max_image_edge",
+                "type": "numberfield",
+                "area": "default",
+                "value": "1568"
+            },
+            {
+                "key": "allowed_paths",
+                "type": "textfield",
+                "area": "default",
+                "value": "upload/"
             },
             {
                 "key": "field_queries",
                 "type": "textarea",
                 "area": "default",
+                "value": ""
+            },
+            {
+                "key": "api_base_url",
+                "type": "textfield",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "inkludocs_apikey",
+                "type": "text-password",
+                "area": "inkludocs",
+                "value": ""
+            },
+            {
+                "key": "inkludocs_language",
+                "type": "textfield",
+                "area": "inkludocs",
+                "value": "de"
+            },
+            {
+                "key": "inkludocs_use_context",
+                "type": "combo-boolean",
+                "area": "inkludocs",
+                "value": "0"
+            },
+            {
+                "key": "inkludocs_base_url",
+                "type": "textfield",
+                "area": "inkludocs",
                 "value": ""
             }
         ]
@@ -37,11 +111,11 @@
     "dependencies": [
         {
             "name": "php",
-            "version": ">=7.2"
+            "version": ">=8.1"
         },
         {
             "name": "modx",
-            "version": ">=2.8"
+            "version": ">=3.0"
         }
     ],
     "build": {
