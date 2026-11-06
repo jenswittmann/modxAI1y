@@ -3,13 +3,13 @@
  *
  * Window.CbAltGenerator (set by the plugin): { connectorAction, fieldQueries, lexicon }.
  * The browser never sees an API key: it posts the image path to the MODX connector, the processor
- * calls Claude on the server and returns the text.
+ * asks the service on the server and returns the text. Plain DOM and fetch, no ExtJS.
  */
 (function () {
     'use strict';
 
     var config = window.CbAltGenerator;
-    if (!config || !window.MODx || !Array.isArray(config.fieldQueries)) {
+    if (!config || !config.connectorUrl || !Array.isArray(config.fieldQueries)) {
         return;
     }
     var lex = config.lexicon || {};
@@ -76,29 +76,40 @@
             button.setAttribute('aria-busy', 'true');
             status.textContent = lex.busy || '';
 
-            MODx.Ajax.request({
-                url: MODx.config.connector_url,
-                timeout: 150000, // the default of 30 seconds is too short for some services
-                params: {
+            var controller = new AbortController();
+            var timer = window.setTimeout(function () {
+                controller.abort();
+            }, 150000); // some services need half a minute and more for a new image
+
+            fetch(config.connectorUrl, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: { modAuth: config.modAuth, 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({
                     action: config.connectorAction,
                     namespace: 'cbaltgenerator',
                     image: image,
                     context: pageTitle(),
-                },
-                listeners: {
-                    success: {
-                        fn: function (response) {
-                            setValue(target, response.object.alt);
-                            finish(lex.done || '');
-                        },
-                    },
-                    failure: {
-                        fn: function (response) {
-                            finish((response && response.message) || lex.error || '');
-                        },
-                    },
-                },
-            });
+                }),
+                signal: controller.signal,
+            })
+                .then(function (response) {
+                    return response.json();
+                })
+                .then(function (data) {
+                    if (data && data.success && data.object && data.object.alt) {
+                        setValue(target, data.object.alt);
+                        finish(lex.done || '');
+                    } else {
+                        finish((data && data.message) || lex.error || '');
+                    }
+                })
+                .catch(function () {
+                    finish(lex.error || '');
+                })
+                .finally(function () {
+                    window.clearTimeout(timer);
+                });
         });
     };
 

@@ -47,8 +47,8 @@ out). `--out=<dir>` changes the target folder. Version and system settings come 
 ## How it works
 
 1. The plugin adds a button to the image fields in the resource editor (creating and editing resources only).
-2. A click posts the image path to the manager connector (`CbAltGenerator\Processors\Mgr\AltText\Generate`).
-   The API keys are never part of the page.
+2. A click posts the image path to the manager connector (`CbAltGenerator\Processors\Mgr\AltText\Generate`) with
+   `fetch`, the script is plain DOM code without ExtJS. The API keys are never part of the page.
 3. The processor reads the image from the web root, scales it down (default: longest edge 1568 px), sends it to the chosen
    service and returns one short text.
 4. The text lands in the title field. It is a suggestion: please check it before you save.
@@ -61,9 +61,10 @@ The processor needs an active manager session and the permission `save_document`
 - **claude:** the Anthropic Messages API with the official PHP SDK. Prompt, model, language and maximum length are
   system settings. An image is scaled to at most 1568 px, which is about 1,500 input tokens: with Claude Haiku 5.5 an
   alt text costs a fraction of a cent.
-- **inkludocs:** `POST /api/v1/alt-text` with the image as base64 and the page title as `context`. InkluDocs has its own
-  rules for the text, so prompt, model and maximum length do not apply. It is billed in credits (5 per image, see the
-  InkluDocs documentation).
+- **inkludocs:** `POST /api/v1/alt-text` with the image as base64. InkluDocs has its own rules for the text, so prompt and
+  model do not apply: the extra keeps the first whole sentences up to `cbaltgenerator.max_length`. The page title is only sent
+  as `context` when `cbaltgenerator.inkludocs_use_context` is on (it shapes the text a lot). A new image takes 25 to 45
+  seconds, an image seen before about a second. It is billed in credits (5 per image, see the InkluDocs documentation).
 
 More services are a class in `src/Providers/` that implements `ProviderInterface`.
 
@@ -81,13 +82,15 @@ The generated texts can be wrong: every text needs a check by an editor.
 | `cbaltgenerator.model`              | Claude model, default `claude-haiku-5-5` (fast and cheap, enough for short alt texts).                                  |
 | `cbaltgenerator.prompt`             | Instruction for the alt texts. Placeholders: `{max_length}`, `{language}`. Empty: the default prompt.                   |
 | `cbaltgenerator.language`           | Language of the alt texts as written in the prompt, default `Deutsch`.                                                  |
-| `cbaltgenerator.max_length`         | Maximum number of characters (Claude), default 125.                                                                     |
+| `cbaltgenerator.max_length`         | Maximum number of characters, default 125. Claude is asked for it, texts of other services are shortened to whole sentences. |
+| `cbaltgenerator.use_context`        | Send the page title to Claude as a hint, default yes.                                                                   |
 | `cbaltgenerator.max_image_edge`     | Longest image edge in pixels before sending, default 1568.                                                              |
 | `cbaltgenerator.allowed_paths`      | Comma separated folders (relative to the web root) the images may come from, default `upload/`.                         |
 | `cbaltgenerator.field_queries`      | JSON with the selectors of the ContentBlocks fields that get a button: `[{"field": "…", "image": "…", "target": "…"}]`. |
 | `cbaltgenerator.api_base_url`       | Only for proxies or tests, default `https://api.anthropic.com`.                                                         |
 | `cbaltgenerator.inkludocs_apikey`   | InkluDocs API key (password field), only for the service `inkludocs`.                                                   |
 | `cbaltgenerator.inkludocs_language` | Language code for InkluDocs: `de` (default), `en`, `fr`, `es`, `da`, `sv`.                                              |
+| `cbaltgenerator.inkludocs_use_context` | Send the page title to InkluDocs as context, default no (the title would end up in the alt text).                    |
 | `cbaltgenerator.inkludocs_base_url` | Default `https://inkludocs.de`.                                                                                         |
 
 ## Upgrade from modxAI1y 0.1

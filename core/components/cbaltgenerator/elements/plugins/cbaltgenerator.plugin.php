@@ -44,6 +44,8 @@ if (!is_array($queries) || !$queries) {
 }
 
 $config = [
+    'connectorUrl' => $modx->getOption('connectors_url', null, MODX_CONNECTORS_URL) . 'index.php',
+    'modAuth' => $modx->user->getUserToken($modx->context->get('key')),
     'connectorAction' => 'CbAltGenerator\\Processors\\Mgr\\AltText\\Generate',
     'fieldQueries' => $queries,
     'lexicon' => [

@@ -40,19 +40,42 @@ class Service
         $path = $this->resolveFile($image);
         ['data' => $data, 'mediaType' => $mediaType] = $this->encodeImage($path);
 
-        $context = trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $context) ?? '');
+        // the page title helps Claude as a hint, InkluDocs lets it shape the text a lot: off by default there
+        $useContext = (bool) (int) $this->setting($provider === 'claude' ? 'use_context' : $provider . '_use_context', $provider === 'claude' ? 1 : 0);
+        $context = $useContext ? trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $context) ?? '') : '';
         $context = mb_substr($context, 0, 200);
         $maxLength = max(20, (int) $this->setting('max_length', 125));
 
         @set_time_limit(150); // some services need half a minute and more for a new image
         $text = $this->provider($provider)->generate($data, $mediaType, $context, $maxLength);
 
-        // Claude is asked for the length, InkluDocs has its own rules: only tidy up its text
-        $alt = $this->clean($text, $provider === 'claude' ? $maxLength : 1000);
+        // Claude is asked for the length; other services write what they want: keep whole sentences up to the maximum
+        $alt = $this->clean($provider === 'claude' ? $text : $this->firstSentences($text, $maxLength), $maxLength);
         if ($alt === '') {
             throw new ServiceException($this->lex('cbaltgenerator.error.empty'));
         }
         return $alt;
+    }
+
+    /**
+     * The first sentences of $text that fit into $maxLength characters (the whole text when it fits,
+     * the beginning of the text when even the first sentence is too long).
+     */
+    public function firstSentences(string $text, int $maxLength): string
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+        if (mb_strlen($text) <= $maxLength) {
+            return $text;
+        }
+        $result = '';
+        foreach (preg_split('/(?<=[.!?])\s+(?=[\p{Lu}"„])/u', $text) ?: [] as $sentence) {
+            $next = $result === '' ? $sentence : $result . ' ' . $sentence;
+            if (mb_strlen($next) > $maxLength) {
+                break;
+            }
+            $result = $next;
+        }
+        return $result !== '' ? $result : $text;
     }
 
     private function provider(string $name): ProviderInterface

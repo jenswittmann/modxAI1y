@@ -47,6 +47,12 @@
                 "value": "Deutsch"
             },
             {
+                "key": "use_context",
+                "type": "combo-boolean",
+                "area": "default",
+                "value": "1"
+            },
+            {
                 "key": "max_length",
                 "type": "numberfield",
                 "area": "default",
@@ -87,6 +93,12 @@
                 "type": "textfield",
                 "area": "inkludocs",
                 "value": "de"
+            },
+            {
+                "key": "inkludocs_use_context",
+                "type": "combo-boolean",
+                "area": "inkludocs",
+                "value": "0"
             },
             {
                 "key": "inkludocs_base_url",
