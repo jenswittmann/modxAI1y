@@ -79,8 +79,9 @@ class ClaudeProvider extends AbstractProvider
         if ($prompt === '') {
             $prompt = $this->lex('cbaltgenerator.default_prompt');
         }
+        // ask for a bit less than the hard limit, so that the text is rarely cut off in the middle of a phrase
         return strtr($prompt, [
-            '{max_length}' => (string) $maxLength,
+            '{max_length}' => (string) max(20, (int) floor($maxLength * 0.85)),
             '{language}' => (string) $this->setting('language', 'Deutsch'),
         ]);
     }

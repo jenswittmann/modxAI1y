@@ -18,6 +18,7 @@ use MODX\Revolution\modPluginEvent;
 use MODX\Revolution\modSystemSetting;
 use MODX\Revolution\modX;
 use MODX\Revolution\Transport\modPackageBuilder;
+use xPDO\Transport\xPDOFileVehicle;
 use xPDO\Transport\xPDOTransport;
 
 $options = getopt('', ['core:', 'out::']);
@@ -137,11 +138,16 @@ foreach ($config['package']['elements']['plugins'] as $def) {
     ]));
 }
 
-// files: core/components/<name> and assets/components/<name>
-$files = $builder->createVehicle(new stdClass(), []);
-$files->resolve('file', ['source' => $staging . 'core/components/' . $name, 'target' => "return MODX_CORE_PATH . 'components/';"]);
-$files->resolve('file', ['source' => $staging . 'assets/components/' . $name, 'target' => "return MODX_ASSETS_PATH . 'components/';"]);
-$builder->putVehicle($files);
+// files: core/components/<name> and assets/components/<name> (file vehicles, no database object)
+foreach ([
+    ['core/components/' . $name, "return MODX_CORE_PATH . 'components/';"],
+    ['assets/components/' . $name, "return MODX_ASSETS_PATH . 'components/';"],
+] as [$source, $target]) {
+    $builder->putVehicle($builder->createVehicle(
+        ['source' => $staging . $source, 'target' => $target],
+        ['vehicle_class' => xPDOFileVehicle::class]
+    ));
+}
 
 $builder->setPackageAttributes([
     'license' => file_get_contents($root . '/core/components/' . $name . '/docs/license.md'),
