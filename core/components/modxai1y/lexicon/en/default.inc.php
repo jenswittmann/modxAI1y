@@ -12,11 +12,13 @@ $_lang['modxai1y.default_prompt'] = 'You write alt texts for images on a website
 
 $_lang['modxai1y.error.generic'] = 'The alt text could not be created.';
 $_lang['modxai1y.error.no_image'] = 'Please choose an image first.';
-$_lang['modxai1y.error.api_key_missing'] = 'No API key. Please enter it in the system setting modxai1y.apikey.';
-$_lang['modxai1y.error.api_key_invalid'] = 'The API key was rejected. Please check the system setting modxai1y.apikey.';
+$_lang['modxai1y.error.api_key_missing'] = 'No API key. Please enter it in the system setting [[+setting]].';
+$_lang['modxai1y.error.api_key_invalid'] = 'The API key was rejected. Please check the system setting [[+setting]].';
 $_lang['modxai1y.error.busy'] = 'The service is busy right now. Please try again in a moment.';
 $_lang['modxai1y.error.connection'] = 'The connection to the service failed. Please try again.';
 $_lang['modxai1y.error.api'] = 'The service answered with an error ([[+status]]). Details are in the MODX error log.';
+$_lang['modxai1y.error.credits'] = 'The credits of the service are used up.';
+$_lang['modxai1y.error.provider'] = 'Unknown service "[[+provider]]". Please check the system setting modxai1y.provider (claude or inkludocs).';
 $_lang['modxai1y.error.refusal'] = 'The model did not describe this image.';
 $_lang['modxai1y.error.empty'] = 'The service returned no text.';
 $_lang['modxai1y.error.vendor'] = 'The Composer packages are missing (core/components/modxai1y/vendor).';

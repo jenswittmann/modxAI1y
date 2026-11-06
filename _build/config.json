@@ -1,7 +1,7 @@
 {
     "name": "modxAI1y",
     "lowCaseName": "modxai1y",
-    "description": "modxAI1y creates alt texts for images in ContentBlocks with Claude.",
+    "description": "modxAI1y creates alt texts for images in ContentBlocks with Claude or InkluDocs.",
     "author": "Jens Wittmann",
     "version": "0.2.0-beta",
     "package": {
@@ -9,20 +9,91 @@
             "plugins": [
                 {
                     "name": "modxai1y",
-                    "events": ["OnManagerPageBeforeRender"]
+                    "events": [
+                        "OnManagerPageBeforeRender"
+                    ]
                 }
             ]
         },
         "systemSettings": [
-            { "key": "apikey", "type": "text-password", "area": "default", "value": "" },
-            { "key": "model", "type": "textfield", "area": "default", "value": "claude-haiku-5-5" },
-            { "key": "prompt", "type": "textarea", "area": "default", "value": "" },
-            { "key": "language", "type": "textfield", "area": "default", "value": "Deutsch" },
-            { "key": "max_length", "type": "numberfield", "area": "default", "value": "125" },
-            { "key": "max_image_edge", "type": "numberfield", "area": "default", "value": "1568" },
-            { "key": "allowed_paths", "type": "textfield", "area": "default", "value": "upload/" },
-            { "key": "field_queries", "type": "textarea", "area": "default", "value": "" },
-            { "key": "api_base_url", "type": "textfield", "area": "default", "value": "" }
+            {
+                "key": "provider",
+                "type": "textfield",
+                "area": "default",
+                "value": "claude"
+            },
+            {
+                "key": "apikey",
+                "type": "text-password",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "model",
+                "type": "textfield",
+                "area": "default",
+                "value": "claude-haiku-5-5"
+            },
+            {
+                "key": "prompt",
+                "type": "textarea",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "language",
+                "type": "textfield",
+                "area": "default",
+                "value": "Deutsch"
+            },
+            {
+                "key": "max_length",
+                "type": "numberfield",
+                "area": "default",
+                "value": "125"
+            },
+            {
+                "key": "max_image_edge",
+                "type": "numberfield",
+                "area": "default",
+                "value": "1568"
+            },
+            {
+                "key": "allowed_paths",
+                "type": "textfield",
+                "area": "default",
+                "value": "upload/"
+            },
+            {
+                "key": "field_queries",
+                "type": "textarea",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "api_base_url",
+                "type": "textfield",
+                "area": "default",
+                "value": ""
+            },
+            {
+                "key": "inkludocs_apikey",
+                "type": "text-password",
+                "area": "inkludocs",
+                "value": ""
+            },
+            {
+                "key": "inkludocs_language",
+                "type": "textfield",
+                "area": "inkludocs",
+                "value": "de"
+            },
+            {
+                "key": "inkludocs_base_url",
+                "type": "textfield",
+                "area": "inkludocs",
+                "value": ""
+            }
         ]
     },
     "dependencies": [

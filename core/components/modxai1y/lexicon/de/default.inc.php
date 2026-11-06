@@ -12,11 +12,13 @@ $_lang['modxai1y.default_prompt'] = 'Du schreibst Alt-Texte für Bilder auf eine
 
 $_lang['modxai1y.error.generic'] = 'Der Alt-Text konnte nicht erzeugt werden.';
 $_lang['modxai1y.error.no_image'] = 'Bitte zuerst ein Bild auswählen.';
-$_lang['modxai1y.error.api_key_missing'] = 'Kein API-Key. Bitte in der Systemeinstellung modxai1y.apikey eintragen.';
-$_lang['modxai1y.error.api_key_invalid'] = 'Der API-Key wurde abgelehnt. Bitte die Systemeinstellung modxai1y.apikey prüfen.';
+$_lang['modxai1y.error.api_key_missing'] = 'Kein API-Key. Bitte in der Systemeinstellung [[+setting]] eintragen.';
+$_lang['modxai1y.error.api_key_invalid'] = 'Der API-Key wurde abgelehnt. Bitte die Systemeinstellung [[+setting]] prüfen.';
 $_lang['modxai1y.error.busy'] = 'Der Dienst ist gerade ausgelastet. Bitte gleich noch einmal versuchen.';
 $_lang['modxai1y.error.connection'] = 'Die Verbindung zum Dienst ist fehlgeschlagen. Bitte noch einmal versuchen.';
 $_lang['modxai1y.error.api'] = 'Der Dienst hat mit einem Fehler geantwortet ([[+status]]). Details stehen im MODX-Fehlerprotokoll.';
+$_lang['modxai1y.error.credits'] = 'Das Guthaben des Dienstes ist aufgebraucht.';
+$_lang['modxai1y.error.provider'] = 'Unbekannter Dienst „[[+provider]]“. Bitte die Systemeinstellung modxai1y.provider prüfen (claude oder inkludocs).';
 $_lang['modxai1y.error.refusal'] = 'Das Modell hat dieses Bild nicht beschrieben.';
 $_lang['modxai1y.error.empty'] = 'Der Dienst hat keinen Text geliefert.';
 $_lang['modxai1y.error.vendor'] = 'Die Composer-Pakete fehlen (core/components/modxai1y/vendor).';

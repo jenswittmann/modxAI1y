@@ -4,31 +4,24 @@ declare(strict_types=1);
 
 namespace Modxai1y;
 
-use Anthropic\Client;
-use Anthropic\Core\Exceptions\APIConnectionException;
-use Anthropic\Core\Exceptions\APIStatusException;
-use Anthropic\Core\Exceptions\AuthenticationException;
-use Anthropic\Core\Exceptions\OverloadedException;
-use Anthropic\Core\Exceptions\RateLimitException;
+use Modxai1y\Providers\ClaudeProvider;
+use Modxai1y\Providers\InkluDocsProvider;
+use Modxai1y\Providers\ProviderInterface;
 use MODX\Revolution\modX;
 
 /**
- * Creates alt texts for images with Claude.
+ * Creates alt texts for images.
  *
- * The API key never leaves the server: the manager only talks to the processor
- * (Processors\Mgr\AltText\Generate), which reads the image from the web root, calls the
- * Anthropic Messages API and returns plain text.
+ * The API keys never leave the server: the manager only talks to the processor
+ * (Processors\Mgr\AltText\Generate), which reads the image from the web root, asks the configured
+ * provider (Claude or InkluDocs) and returns plain text.
  */
 class Service
 {
-    public const DEFAULT_MODEL = 'claude-haiku-5-5';
-
     /** the API takes images up to 5 MB, bigger ones are scaled down */
     private const MAX_IMAGE_BYTES = 4_500_000;
 
     private const MIME_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-
-    private ?Client $client = null;
 
     public function __construct(private readonly modX $modx)
     {
@@ -43,62 +36,37 @@ class Service
      */
     public function generate(string $image, string $context = ''): string
     {
+        $provider = strtolower(trim((string) $this->setting('provider', 'claude')));
         $path = $this->resolveFile($image);
         ['data' => $data, 'mediaType' => $mediaType] = $this->encodeImage($path);
 
-        $maxLength = max(20, (int) $this->setting('max_length', 125));
-        $text = 'Schreibe den Alt-Text für dieses Bild.';
         $context = trim(preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $context) ?? '');
-        if ($context !== '') {
-            $text .= "\n\nKontext (nur zur Orientierung, nicht wiederholen): " . mb_substr($context, 0, 200);
-        }
+        $context = mb_substr($context, 0, 200);
+        $maxLength = max(20, (int) $this->setting('max_length', 125));
 
-        $params = [
-            'model' => (string) $this->setting('model', self::DEFAULT_MODEL),
-            'maxTokens' => 1024,
-            'system' => $this->systemPrompt($maxLength),
-            'messages' => [[
-                'role' => 'user',
-                'content' => [
-                    ['type' => 'image', 'source' => ['type' => 'base64', 'mediaType' => $mediaType, 'data' => $data]],
-                    ['type' => 'text', 'text' => $text],
-                ],
-            ]],
-        ];
-        // a short answer needs no deep thinking (effort exists from the 5.x models on)
-        if (preg_match('/^claude-(haiku|sonnet|opus|fable)-5/', $params['model'])) {
-            $params['outputConfig'] = ['effort' => 'low'];
-        }
+        $text = $this->provider($provider)->generate($data, $mediaType, $context, $maxLength);
 
-        try {
-            $message = $this->client()->messages->create(...$params);
-        } catch (AuthenticationException $e) {
-            $this->logError($e);
-            throw new ServiceException($this->lex('modxai1y.error.api_key_invalid'));
-        } catch (RateLimitException | OverloadedException $e) {
-            $this->logError($e);
-            throw new ServiceException($this->lex('modxai1y.error.busy'));
-        } catch (APIConnectionException $e) {
-            $this->logError($e);
-            throw new ServiceException($this->lex('modxai1y.error.connection'));
-        } catch (APIStatusException $e) {
-            $this->logError($e);
-            throw new ServiceException($this->lex('modxai1y.error.api', ['status' => (string) $e->status]));
+        // Claude is asked for the length, InkluDocs has its own rules: only tidy up its text
+        $alt = $this->clean($text, $provider === 'claude' ? $maxLength : 1000);
+        if ($alt === '') {
+            throw new ServiceException($this->lex('modxai1y.error.empty'));
         }
+        return $alt;
+    }
 
-        if ($message->stopReason === 'refusal') {
-            throw new ServiceException($this->lex('modxai1y.error.refusal'));
+    private function provider(string $name): ProviderInterface
+    {
+        $autoload = dirname(__DIR__) . '/vendor/autoload.php';
+        if (!is_file($autoload)) {
+            throw new ServiceException($this->lex('modxai1y.error.vendor'));
         }
+        require_once $autoload;
 
-        foreach ($message->content as $block) {
-            if ($block->type === 'text') {
-                $alt = $this->clean($block->text, $maxLength);
-                if ($alt !== '') {
-                    return $alt;
-                }
-            }
-        }
-        throw new ServiceException($this->lex('modxai1y.error.empty'));
+        return match ($name) {
+            'claude' => new ClaudeProvider($this->modx),
+            'inkludocs' => new InkluDocsProvider($this->modx),
+            default => throw new ServiceException($this->lex('modxai1y.error.provider', ['provider' => $name])),
+        };
     }
 
     /**
@@ -217,41 +185,6 @@ class Service
         return $text;
     }
 
-    private function systemPrompt(int $maxLength): string
-    {
-        $prompt = trim((string) $this->setting('prompt', ''));
-        if ($prompt === '') {
-            $prompt = $this->lex('modxai1y.default_prompt');
-        }
-        return strtr($prompt, [
-            '{max_length}' => (string) $maxLength,
-            '{language}' => (string) $this->setting('language', 'Deutsch'),
-        ]);
-    }
-
-    private function client(): Client
-    {
-        if ($this->client === null) {
-            $autoload = dirname(__DIR__) . '/vendor/autoload.php';
-            if (!is_file($autoload)) {
-                throw new ServiceException($this->lex('modxai1y.error.vendor'));
-            }
-            require_once $autoload;
-
-            $key = trim((string) $this->setting('apikey', ''));
-            $baseUrl = trim((string) $this->setting('api_base_url', ''));
-            if ($key === '' && getenv('ANTHROPIC_API_KEY') === false) {
-                throw new ServiceException($this->lex('modxai1y.error.api_key_missing'));
-            }
-            $this->client = new Client(
-                apiKey: $key !== '' ? $key : null,
-                baseUrl: $baseUrl !== '' ? $baseUrl : null,
-                requestOptions: ['timeout' => 30.0, 'maxRetries' => 1],
-            );
-        }
-        return $this->client;
-    }
-
     private function setting(string $key, mixed $default = null): mixed
     {
         return $this->modx->getOption('modxai1y.' . $key, null, $default, true);
@@ -260,11 +193,5 @@ class Service
     private function lex(string $key, array $params = []): string
     {
         return $this->modx->lexicon($key, $params);
-    }
-
-    /** details go to the MODX error log, never to the browser (and never the key) */
-    private function logError(\Throwable $e): void
-    {
-        $this->modx->log(modX::LOG_LEVEL_ERROR, '[modxAI1y] ' . $e::class . ': ' . $e->getMessage());
     }
 }

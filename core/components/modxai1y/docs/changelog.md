@@ -1,6 +1,7 @@
 ## modxAI1y 0.2.0-beta
 
 - Claude (Anthropic Messages API, default model `claude-haiku-5-5`) instead of OpenAI
+- second service InkluDocs (`modxai1y.provider` = `inkludocs`), services are classes in `src/Providers/`
 - the API call runs on the server (manager connector processor), the API key is no longer part of the manager page
 - MODX 3 only (namespace, class based processor, lexicon in English and German)
 - images are read from the allowed folders only (`modxai1y.allowed_paths`), scaled down before they are sent
